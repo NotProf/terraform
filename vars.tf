@@ -25,3 +25,7 @@ variable "marketplace_cloudfront_default_ttl" {
 variable "marketplace_cloudfront_max_ttl" {
   type = number
 }
+
+variable "email_address" {
+  type = string
+}

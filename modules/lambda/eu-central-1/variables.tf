@@ -55,3 +55,23 @@ variable "name" {
   type        = string
 }
 
+variable "authors_role_arn" {
+  description = "authors_role"
+  type        = string
+}
+
+variable "courses_role_arn" {
+  description = "courses_role_arn"
+  type        = string
+}
+
+variable "author_table_name" {
+  description = "author_table_name"
+  type        = string
+}
+
+variable "course_table_name" {
+  description = "course_table_name"
+  type        = string
+}
+

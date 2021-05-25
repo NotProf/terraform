@@ -1,59 +1,46 @@
+
+
+# IHOR KARPIUK IT-13
 module "frontend" {
-  source      = "./modules/s3/eu-central-1"
-  context     = module.base_labels.context
-  name        = "frontend"
-#   marketplace_cloudfront_min_ttl = var.marketplace_cloudfront_min_ttl
-#   marketplace_cloudfront_default_ttl = var.marketplace_cloudfront_default_ttl
-#   marketplace_cloudfront_max_ttl = var.marketplace_cloudfront_max_ttl
+  source = "./modules/s3/eu-central-1"
+  context = module.base_labels.context
+  name = "frontend"
 }
 
 module "dynamo_db_courses" {
-  source      = "./modules/dynamodb/eu-central-1"
-  context     = module.base_labels.context
-  name        = "courses"
+  source = "./modules/dynamodb/eu-central-1"
+  context = module.base_labels.context
+  name = "courses"
 }
 
 module "dynamo_db_authors" {
-  source      = "./modules/dynamodb/eu-central-1"
-  context     = module.base_labels.context
-  name        = "authors"
+  source = "./modules/dynamodb/eu-central-1"
+  context = module.base_labels.context
+  name = "authors"
+}
+
+module "iam" {
+  source = "./modules/iam"
+  context = module.base_labels.context
+  name = "iam"
+  dynamo_db_authors_arn = module.dynamo_db_authors.dynamo_db_arn
+  dynamo_db_courses_arn = module.dynamo_db_courses.dynamo_db_arn
 }
 
 module "lambda" {
-  source      = "./modules/lambda/eu-central-1"
-  context     = module.base_labels.context
-  name        = "lambda"
+  source = "./modules/lambda/eu-central-1"
+  context = module.base_labels.context
+  name = "lambda"
+  authors_role_arn = module.iam.authors_role_arn
+  courses_role_arn = module.iam.courses_role_arn
+  author_table_name =  module.dynamo_db_authors.dynamo_db_name
+  course_table_name = module.dynamo_db_courses.dynamo_db_name
 }
 
-
-
-
-
-
-
-
-
-
-
-
-resource "aws_dynamodb_table" "example" {
-  name             = module.base_labels.id
-  hash_key         = "id"
-
-  billing_mode     = "PAY_PER_REQUEST"
-  # stream_enabled   = true
-  # stream_view_type = "NEW_AND_OLD_IMAGES"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-
-  /* replica {
-    region_name = "us-east-2"
-  }
-
-  replica {
-    region_name = "us-west-2"
-  } */
+module "budget" {
+  source = "./modules/budget"
+  context = module.base_labels.context
+  name = "budget"
+  email_address = var.email_address
 }
+
